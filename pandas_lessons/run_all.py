@@ -1,6 +1,6 @@
 """
 Run all Pandas lessons sequentially
-This script executes all 19 Pandas lessons in order.
+This script executes all 20 Pandas lessons in order.
 """
 # type: ignore
 
@@ -31,6 +31,7 @@ from lesson16_data_transformation import main as lesson16
 from lesson17_csv_operations import main as lesson17
 from lesson18_excel_operations import main as lesson18
 from lesson19_json_operations import main as lesson19
+from lesson20_datetime import main as lesson20
 
 
 def run_all_lessons():
@@ -55,6 +56,7 @@ def run_all_lessons():
         ("Lesson 17: Working with CSV Files", lesson17),
         ("Lesson 18: Working with Excel Files", lesson18),
         ("Lesson 19: Working with JSON Files", lesson19),
+        ("Lesson 20: Date & Time Manipulation", lesson20),
     ]
     
     print("\n" + "="*80)

@@ -1,6 +1,6 @@
 # Pandas Lessons
 
-A comprehensive collection of 19 Pandas lessons organized into separate, executable modules. Each lesson focuses on a specific aspect of the Pandas library, from basic Series and DataFrames to advanced data manipulation and file I/O operations.
+A comprehensive collection of 20 Pandas lessons organized into separate, executable modules. Each lesson focuses on a specific aspect of the Pandas library, from basic Series and DataFrames to advanced data manipulation and file I/O operations.
 
 ## 📚 Lesson Overview
 
@@ -30,6 +30,9 @@ A comprehensive collection of 19 Pandas lessons organized into separate, executa
 17. **Working with CSV Files** - Read from and write to CSV files
 18. **Working with Excel Files** - Work with Excel files and multiple sheets
 19. **Working with JSON Files** - Read from and write to JSON files
+
+### Advanced Topics (Lesson 20)
+20. **Date & Time Manipulation** - Work with dates, times, and time series data
 
 ## 🚀 Getting Started
 
@@ -94,7 +97,8 @@ pandas_lessons/
 ├── lesson16_data_transformation.py  # Lesson 16: Data Transformation
 ├── lesson17_csv_operations.py       # Lesson 17: CSV Operations
 ├── lesson18_excel_operations.py     # Lesson 18: Excel Operations
-└── lesson19_json_operations.py      # Lesson 19: JSON Operations
+├── lesson19_json_operations.py      # Lesson 19: JSON Operations
+└── lesson20_datetime.py             # Lesson 20: Date & Time Manipulation
 ```
 
 ## 💡 Features
