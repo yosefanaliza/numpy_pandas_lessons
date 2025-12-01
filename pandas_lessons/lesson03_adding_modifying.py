@@ -42,13 +42,18 @@ def main():
 
     # Modifying existing values
     print("\n4. Modifying values (increase all salaries by 5%):")
-    df['Salary'] = df['Salary'] * 1.05
+    df['Salary'] *= df['Salary'] * 1.05
     print(df)
     
     # Adding a new row using loc
     print("\n5. Adding a new row:")
     df.loc[3] = ['David', 28, 90000, 'Sales', 9000]
     print(df)
+
+    # Add to end
+    print("\n5. Adding a new row using shape:")
+    df.loc[df.shape[0]] = ['Eve', 32, 85000, 'Marketing', 8500]
+    print(df) 
     
     # Deleting a column
     print("\n6. Deleting the Bonus column:")

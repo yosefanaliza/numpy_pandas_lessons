@@ -79,190 +79,150 @@ def main():
     print("Time series data (first 5 rows):")
     print(df.head())
     
-    # 4. Extracting date components
-    print("\n\n4. Extracting Date Components:")
+    # 4. Reading CSV with Date Parsing
+    print("\n\n4. Reading CSV and Parsing Dates:")
     print("-" * 40)
     
-    # Access datetime properties from DatetimeIndex
-    dt_index = pd.DatetimeIndex(df.index)
-    df['year'] = dt_index.year
-    df['month'] = dt_index.month
-    df['day'] = dt_index.day
-    df['day_of_week'] = dt_index.dayofweek  # Monday=0, Sunday=6
-    df['day_name'] = dt_index.day_name()
-    df['quarter'] = dt_index.quarter
-    df['week_of_year'] = dt_index.isocalendar().week
+    # Create sample CSV data with various date formats
+    sample_data = """date,product,sales,quantity
+01/15/2024,Widget A,1500.50,25
+02/20/2024,Widget B,2300.75,40
+03/10/2024,Widget A,1800.25,30"""
     
-    print("Date components (first 5 rows):")
-    print(df[['sales', 'year', 'month', 'day', 'day_name', 'quarter']].head())
+    # Save to temporary CSV
+    with open('temp_sales.csv', 'w') as f:
+        f.write(sample_data)
     
-    # 5. Filtering by date
-    print("\n\n5. Filtering by Date:")
+    # Method 1: Parse dates while reading CSV
+    print("\nMethod 1: Parse dates during CSV read:")
+    df_sales = pd.read_csv('temp_sales.csv', parse_dates=['date'])
+    print(df_sales)
+    print(f"\nDate column type: {df_sales['date'].dtype}")
+    
+    # Method 2: Specify custom date format
+    print("\n\nMethod 2: Custom date format (MM/DD/YYYY):")
+    df_sales2 = pd.read_csv('temp_sales.csv', 
+                            parse_dates=['date'],
+                            date_format='%m/%d/%Y')
+    print(df_sales2)
+    
+    # Method 3: Parse after reading
+    print("\n\nMethod 3: Parse dates after reading:")
+    df_sales3 = pd.read_csv('temp_sales.csv')
+    df_sales3['date'] = pd.to_datetime(df_sales3['date'], format='%m/%d/%Y')
+    print(df_sales3)
+    
+    # Method 4: Set date as index while reading
+    print("\n\nMethod 4: Set date as index during read:")
+    df_sales4 = pd.read_csv('temp_sales.csv', 
+                            parse_dates=['date'],
+                            index_col='date')
+    print(df_sales4)
+    
+    # Clean up temporary file
+    import os
+    if os.path.exists('temp_sales.csv'):
+        os.remove('temp_sales.csv')
+    
+    # 5. Common Date Format Examples
+    print("\n\n5. Parsing Different Date Formats:")
     print("-" * 40)
     
-    # Reset for clean example
-    df = df[['sales', 'temperature']]
+    # Various date formats
+    date_formats = {
+        'MM/DD/YYYY': ['01/15/2024', '12/25/2024'],
+        'DD-MM-YYYY': ['15-01-2024', '25-12-2024'],
+        'YYYY/MM/DD': ['2024/01/15', '2024/12/25'],
+        'YYYY-MM-DD': ['2024-01-15', '2024-12-25'],
+        'DD MMM YYYY': ['15 Jan 2024', '25 Dec 2024'],
+        'MMM DD, YYYY': ['Jan 15, 2024', 'Dec 25, 2024']
+    }
     
-    # Select specific month
-    january_data = df['2024-01']
-    print(f"January data: {len(january_data)} rows")
-    print(january_data.head())
+    print("\nParsing different date formats:")
+    for fmt, dates in date_formats.items():
+        parsed = pd.to_datetime(dates[0])
+        print(f"{fmt:15} -> {dates[0]:20} -> {parsed}")
     
-    # Date range filtering
-    feb_march = df['2024-02-01':'2024-03-15']
-    print(f"\nFeb-March data: {len(feb_march)} rows")
-    
-    # Using boolean indexing
-    q1_data = df[(df.index >= '2024-01-01') & (df.index < '2024-04-01')]
-    print(f"\nQ1 2024 data: {len(q1_data)} rows")
-    
-    # 6. Resampling (aggregating by time period)
-    print("\n\n6. Resampling Time Series:")
+    # 6. Handling Mixed or Problematic Dates
+    print("\n\n6. Handling Problematic Dates:")
     print("-" * 40)
     
-    # Weekly average
-    weekly_avg = df.resample('W').mean()
-    print("Weekly averages (first 5):")
-    print(weekly_avg.head())
+    # Mixed formats or invalid dates
+    mixed_dates = pd.Series(['2024-01-15', '15/02/2024', 'invalid', '2024-03-20'])
     
-    # Monthly sum
-    monthly_sum = df['sales'].resample('M').sum()
-    print("\nMonthly sales totals:")
-    print(monthly_sum)
+    # With errors='coerce' - invalid dates become NaT (Not a Time)
+    parsed_dates = pd.to_datetime(mixed_dates, errors='coerce', format='mixed')
+    print("\nMixed/invalid dates (errors='coerce'):")
+    print(parsed_dates)
     
-    # Custom aggregation
-    monthly_agg = df.resample('M').agg({
-        'sales': ['sum', 'mean', 'max'],
-        'temperature': ['mean', 'min', 'max']
+    # 7. Extracting Date Components
+    print("\n\n7. Extracting Date Components:")
+    print("-" * 40)
+    
+    df_extract = pd.DataFrame({
+        'date': pd.date_range('2024-01-01', periods=5, freq='D')
     })
-    print("\nMonthly aggregations:")
-    print(monthly_agg)
     
-    # 7. Rolling windows
-    print("\n\n7. Rolling Window Calculations:")
+    df_extract['year'] = df_extract['date'].dt.year
+    df_extract['month'] = df_extract['date'].dt.month
+    df_extract['day'] = df_extract['date'].dt.day
+    df_extract['day_name'] = df_extract['date'].dt.day_name()
+    df_extract['quarter'] = df_extract['date'].dt.quarter
+    
+    print("\nExtracted date components:")
+    print(df_extract)
+    
+    # 8. Practical Example: Complete CSV Workflow
+    print("\n\n8. Complete CSV Date Parsing Workflow:")
     print("-" * 40)
     
-    # 7-day moving average
-    df['sales_7d_avg'] = df['sales'].rolling(window=7).mean()
-    print("7-day moving average (first 10 rows):")
-    print(df[['sales', 'sales_7d_avg']].head(10))
+    # Create a more complex example
+    complex_data = """transaction_date,customer_id,amount
+2024-01-15,C001,150.50
+2024-01-16,C002,230.75
+2024-01-17,C001,180.25
+2024-01-18,C003,210.00
+2024-01-19,C002,195.50"""
     
-    # 30-day rolling sum
-    df['sales_30d_sum'] = df['sales'].rolling(window=30).sum()
-    print("\n30-day rolling sum:")
-    print(df[['sales', 'sales_30d_sum']].tail())
+    with open('temp_transactions.csv', 'w') as f:
+        f.write(complex_data)
     
-    # 8. Date arithmetic
-    print("\n\n8. Date Arithmetic:")
-    print("-" * 40)
+    # Read CSV with date parsing
+    df_trans = pd.read_csv('temp_transactions.csv',
+                          parse_dates=['transaction_date'],
+                          index_col='transaction_date')
     
-    # Create sample DataFrame
-    orders = pd.DataFrame({
-        'order_date': pd.to_datetime(['2024-01-10', '2024-01-15', '2024-01-20']),
-        'delivery_days': [3, 5, 2]
-    })
+    print("\nTransaction data with parsed dates:")
+    print(df_trans)
     
-    # Add days to dates
-    orders['delivery_date'] = orders['order_date'] + pd.to_timedelta(orders['delivery_days'], unit='D')
-    print("Order and delivery dates:")
-    print(orders)
+    # Add time-based features  # type: ignore
+    df_trans['day_of_week'] = df_trans.index.day_name()  # type: ignore
+    df_trans['month'] = df_trans.index.month  # type: ignore
+    df_trans['is_weekend'] = df_trans.index.dayofweek >= 5  # type: ignore
     
-    # Calculate time differences
-    orders['processing_time'] = orders['delivery_date'] - orders['order_date']
-    print("\nProcessing time:")
-    print(orders[['order_date', 'delivery_date', 'processing_time']])
+    print("\nWith extracted date features:")
+    print(df_trans)
     
-    # 9. Time zones
-    print("\n\n9. Working with Time Zones:")
-    print("-" * 40)
-    
-    # Create timezone-aware dates
-    dates_utc = pd.date_range('2024-01-01', periods=5, freq='D', tz='UTC')
-    print("UTC dates:")
-    print(dates_utc)
-    
-    # Convert to different timezone
-    dates_ny = dates_utc.tz_convert('America/New_York')
-    print("\nNew York timezone:")
-    print(dates_ny)
-    
-    dates_tokyo = dates_utc.tz_convert('Asia/Tokyo')
-    print("\nTokyo timezone:")
-    print(dates_tokyo)
-    
-    # 10. Period and frequency
-    print("\n\n10. Periods and Frequencies:")
-    print("-" * 40)
-    
-    # Create period range
-    periods = pd.period_range('2024-01', periods=12, freq='M')
-    print("Monthly periods (12 months):")
-    print(periods)
-    
-    # Quarter periods
-    quarters = pd.period_range('2024Q1', periods=4, freq='Q')
-    print("\nQuarterly periods:")
-    print(quarters)
-    
-    # 11. Shifting and lagging
-    print("\n\n11. Shifting and Lagging:")
-    print("-" * 40)
-    
-    # Create sample data
-    dates = pd.date_range('2024-01-01', periods=10, freq='D')
-    sales_df = pd.DataFrame({
-        'date': dates,
-        'sales': [100, 120, 115, 130, 125, 140, 135, 150, 145, 160]
-    }).set_index('date')
-    
-    # Shift forward (lag)
-    sales_df['sales_prev_day'] = sales_df['sales'].shift(1)
-    
-    # Shift backward (lead)
-    sales_df['sales_next_day'] = sales_df['sales'].shift(-1)
-    
-    # Calculate change
-    sales_df['daily_change'] = sales_df['sales'] - sales_df['sales_prev_day']
-    
-    print("Shifted data:")
-    print(sales_df)
-    
-    # 12. Practical example: Sales analysis
-    print("\n\n12. Practical Example: Sales Analysis:")
-    print("-" * 40)
-    
-    # Create realistic sales data
-    np.random.seed(42)
-    dates = pd.date_range('2024-01-01', periods=90, freq='D')
-    sales = pd.DataFrame({
-        'date': dates,
-        'sales': np.random.randint(80, 200, 90) + 
-                 np.sin(np.arange(90) * 2 * np.pi / 7) * 20  # Weekly pattern
-    }).set_index('date')
-    
-    # Add day of week
-    dt_index = pd.DatetimeIndex(sales.index)
-    sales['day_of_week'] = dt_index.day_name()
-    
-    # Calculate weekly statistics
-    sales['week'] = dt_index.isocalendar().week
-    weekly_stats = sales.groupby('week')['sales'].agg(['mean', 'sum', 'count'])
-    
-    print("Weekly sales statistics:")
-    print(weekly_stats.head())
-    
-    # Average sales by day of week
-    day_avg = sales.groupby('day_of_week')['sales'].mean().sort_values(ascending=False)
-    print("\nAverage sales by day of week:")
-    print(day_avg)
-    
-    # Calculate 7-day moving average
-    sales['moving_avg_7d'] = sales['sales'].rolling(window=7).mean()
-    print("\nRecent sales with 7-day moving average:")
-    print(sales[['sales', 'moving_avg_7d', 'day_of_week']].tail(10))
+    # Clean up
+    if os.path.exists('temp_transactions.csv'):
+        os.remove('temp_transactions.csv')
     
     print("\n" + "="*60)
-    print("Date & Time Manipulation lesson complete!")
+    print("QUICK REFERENCE: Date Format Codes")
+    print("="*60)
+    print("%Y - 4-digit year (2024)")
+    print("%y - 2-digit year (24)")
+    print("%m - Month as number (01-12)")
+    print("%d - Day of month (01-31)")
+    print("%B - Full month name (January)")
+    print("%b - Abbreviated month (Jan)")
+    print("%A - Full weekday name (Monday)")
+    print("%a - Abbreviated weekday (Mon)")
+    print("%H - Hour 24-hour (00-23)")
+    print("%I - Hour 12-hour (01-12)")
+    print("%M - Minute (00-59)")
+    print("%S - Second (00-59)")
+    print("%p - AM/PM")
     print("="*60)
 
 

@@ -46,7 +46,7 @@ def main():
     
     # Unique values
     print("\n6. Unique categories:")
-    print(df['Category'].unique())
+    print(df['Category'].unique())  
     
     # Value counts
     print("\n7. Count by category:")
