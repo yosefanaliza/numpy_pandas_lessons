@@ -51,6 +51,17 @@ def main():
     df.loc[df['Department'] == 'IT', 'Salary'] = df.loc[df['Department'] == 'IT', 'Salary'] * 1.1
     print(df)
 
+    # Setting a specific column as index
+    print("\n9. Setting 'Name' as index:")
+    df.set_index('Name', inplace=True)
+    print(df)
+
+    # Setting index back to default
+    print("\n10. Resetting index:")
+    df.reset_index(inplace=True)
+    print(df)
+
+
 
 if __name__ == "__main__":
     main()
