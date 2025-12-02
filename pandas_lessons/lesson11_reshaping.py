@@ -25,6 +25,7 @@ def main():
     print("\n1. Wide format DataFrame:")
     print(wide_df)
     
+
     # Melt (wide to long)
     print("\n2. Melt to long format:")
     long_df = pd.melt(wide_df, id_vars=['Name'], var_name='Subject', value_name='Score')

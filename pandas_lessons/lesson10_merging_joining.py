@@ -53,6 +53,11 @@ def main():
     outer = pd.merge(employees, departments, on='DepartmentID', how='outer')
     print(outer)
     
+    # Diff columns
+    print("\n7. Finding employees without a matching department:")
+    outer = pd.merge(employees, departments, left_on='DepartmentID', right_on='DepartmentID', how='outer')
+
+
     # Concatenating DataFrames
     print("\n7. Concatenating DataFrames vertically:")
     df1 = pd.DataFrame({'A': [1, 2], 'B': [3, 4]})
